@@ -3,54 +3,36 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#ifndef CONSUMER
-#define CONSUMER "consumer"
-#endif
+#define CHIP_PATH   "/dev/gpiochip4"   /* Pi‑5 expansion header lives here 
+#define LED_LINE    18                 /* BCM numbering (GPIO18 / pin 12) */
+#define PERIOD_US   500000             
 
-int main(int argc, char **argv) {
-    char *chipname = "gpiochip4";
-    unsigned int line_num=21;
-    unsigned int val;
-    struct gpiod_chip *chip;
-    struct gpiod_line *line;
-    int i,ret;
+static volatile sig_atomic_t keep_running = 1;
+static void sigint_handler(int) { keep_running = 0; }
 
-    chip =gpiod_chip_open_by_name(chipname);
-    if (!chip) {
-        perror("open chip failed\n");
-        goto end;
+int main(void)
+{
+    struct gpiod_chip *chip   = gpiod_chip_open(CHIP_PATH);
+    if (!chip) { perror("gpiod_chip_open"); return 1; }
+
+    struct gpiod_line *led = gpiod_chip_get_line(chip, LED_LINE);
+    if (!led) { perror("gpiod_chip_get_line"); return 1; }
+
+    if (gpiod_line_request_output(led, "blinky", 0) < 0) {
+        perror("gpiod_line_request_output"); return 1;
     }
 
-    line = gpiod_chip_get_line(chip, line_num);
-    if (!line) {
-        perror("get line failed\n");
-        goto close_chip;
+    signal(SIGINT, sigint_handler);          
+
+    int level = 0;
+    while (keep_running) {
+        level ^= 1;                         
+        gpiod_line_set_value(led, level);
+        usleep(PERIOD_US);
     }
 
-    ret =  gpiod_line_request_output(line, CONSUMER, 0);
-    if (ret < 0) {
-        perror("request output failed\n");
-        goto release_line;
-    }
-
-    val = 0;
-    for (i = 0; i < 20; i++) {
-        ret = gpiod_line_set_value(line, val);
-        if (ret < 0) {
-            perror("set value failed\n");
-            goto release_line;
-        }
-        printf("Set line %u to #%u\n", val, line_num);
-        val = !val;
-        sleep(1); 
-    }
-
-    release_line:
-        gpiod_line_release(line);
-
-    close_chip:
-        gpiod_chip_close(chip);
-    
-    end:
-        return 0;
+    gpiod_line_set_value(led, 0);            
+    gpiod_line_release(led);
+    gpiod_chip_close(chip);
+    return 0;
 }
