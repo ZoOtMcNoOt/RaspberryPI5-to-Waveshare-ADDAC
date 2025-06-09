@@ -184,7 +184,7 @@ static UDOUBLE ADS1256_read_ADC_Data(void) {
     read |= ((UDOUBLE)buf[1] << 8);  // Combine the second byte
     read |= buf[2]; // Combine the third byte
     if (read & 0x800000) {
-        read &= 0xFF000000; // Sign extend if the most significant bit is set
+        read &= 0xF000000; // Sign extend if the most significant bit is set
     }
     return read; // Return the combined value
 }

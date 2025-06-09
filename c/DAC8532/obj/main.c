@@ -25,14 +25,14 @@ int main(void)
     
     DAC8532_Out_Voltage(channel_A, 0);
     while(1){
-        for(i=0;i<33;i++){
-            DAC8532_Out_Voltage(channel_A, DAC_VREF * i / 33);
-            DAC8532_Out_Voltage(channel_B, DAC_VREF - DAC_VREF * i / 33);
+        for(i=0;i<50;i++){
+            DAC8532_Out_Voltage(channel_A, DAC_VREF * i / 50);
+            DAC8532_Out_Voltage(channel_B, DAC_VREF - DAC_VREF * i / 50);
             DEV_Delay_ms(100);
         }
-        for(i=0;i<33;i++){
-            DAC8532_Out_Voltage(channel_B, DAC_VREF * i / 33);
-            DAC8532_Out_Voltage(channel_A, DAC_VREF - DAC_VREF * i / 33);
+        for(i=0;i<50;i++){
+            DAC8532_Out_Voltage(channel_B, DAC_VREF * i / 50);
+            DAC8532_Out_Voltage(channel_A, DAC_VREF - DAC_VREF * i / 50);
             DEV_Delay_ms(100);
         }
     }

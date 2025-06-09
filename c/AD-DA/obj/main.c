@@ -44,7 +44,7 @@ int main(void)
         printf("\33[9A"); // Move the cursor up 8 lines
         
         DAC8532_Out_Voltage(channel_B, (x));
-        DAC8532_Out_Voltage(channel_A, (3.3 - x));
+        DAC8532_Out_Voltage(channel_A, (5.0 - x));
     }
     return 0;
 }
