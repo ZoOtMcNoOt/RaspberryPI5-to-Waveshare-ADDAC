@@ -1,0 +1,32 @@
+# binaries
+*.out
+# build artifacts
+*.o
+# temporary files
+*.tmp
+# logs
+*.log
+# IDE files
+*.vscode
+# OS generated files
+.DS_Store
+# Python cache files
+__pycache__/
+# Python bytecode files
+*.pyc
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Python virtual environment
+venv/
+# Python egg files
+*.egg
+# Python distribution files
+*.egg-info/
+# Coverage reports
+*.coverage
+# Test output
+*.test
+# Documentation build artifacts
+docs/_build/
+# CMake build directory
+build/
