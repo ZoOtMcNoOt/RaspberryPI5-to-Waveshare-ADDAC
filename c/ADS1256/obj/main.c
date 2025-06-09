@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <time.h>
-#include "DAC8532.h"
+#include "ADS1256.h"
 #include "stdio.h"
 #include <string.h>
 
@@ -15,26 +15,25 @@ void Handler(int signo)
 
 int main(void)
 {
-    UDOUBLE i;
+    UDOUBLE ADC[8],i;
+    printf("demo\r\n");
     DEV_ModuleInit();
 
     // Exception handling:ctrl + c
     signal(SIGINT, Handler);
-    
-    printf("Program start\r\n");
-    
-    DAC8532_Out_Voltage(channel_A, 0);
+
+    if(ADS1256_init() == 1){
+        printf("\r\nEND                  \r\n");
+        DEV_ModuleExit();
+        exit(0);
+    }
+
     while(1){
-        for(i=0;i<33;i++){
-            DAC8532_Out_Voltage(channel_A, DAC_VREF * i / 33);
-            DAC8532_Out_Voltage(channel_B, DAC_VREF - DAC_VREF * i / 33);
-            DEV_Delay_ms(100);
+        ADS1256_GetAll(ADC);
+        for(i=0;i<8;i++){
+            printf("%d %f\r\n",i,ADC[i]*5.0/0x7fffff);
         }
-        for(i=0;i<33;i++){
-            DAC8532_Out_Voltage(channel_B, DAC_VREF * i / 33);
-            DAC8532_Out_Voltage(channel_A, DAC_VREF - DAC_VREF * i / 33);
-            DEV_Delay_ms(100);
-        }
+        printf("\33[8A");//Move the cursor up 8 lines
     }
     return 0;
 }

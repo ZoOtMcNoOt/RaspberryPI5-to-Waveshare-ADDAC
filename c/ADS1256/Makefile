@@ -4,7 +4,7 @@ DIR_BIN = ./bin
 OBJ_C = $(wildcard ${DIR_OBJ}/*.c)
 OBJ_O = $(patsubst %.c,${DIR_BIN}/%.o,$(notdir ${OBJ_C}))
 
-TARGET = dac8532_test
+TARGET = ads1256_test
 
 CC = gcc
 DEBUG = -g -O0 -Wall
