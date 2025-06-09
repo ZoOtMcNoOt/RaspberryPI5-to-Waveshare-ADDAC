@@ -99,6 +99,7 @@ void ADS1256_SetMode(UBYTE Mode);
 void ADS1256_ConfigADC(ADS1256_GAIN gain, ADS1256_DRATE drate);
 UDOUBLE ADS1256_GetChannalValue(UBYTE Channel);
 void ADS1256_GetAll(UDOUBLE *ADC_Value);
+void ADS1256_GetAll_Fast(UDOUBLE *ADC_Value);
 UBYTE ASD1256_ReadChipID(void);
 
 #endif

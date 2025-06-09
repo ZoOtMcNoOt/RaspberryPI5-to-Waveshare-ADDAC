@@ -64,7 +64,7 @@ int DEV_ModuleInit(void) {
     // Set SPI mode, bits per word, and speed
     uint8_t mode = SPI_MODE_1;
     uint8_t bits = 8;
-    uint32_t speed = 1000000; // 1 MHz
+    uint32_t speed = 10000000; // 10 MHz (increased from 1 MHz)
 
     if (ioctl(spi_fd, SPI_IOC_WR_MODE, &mode) < 0 ||
         ioctl(spi_fd, SPI_IOC_WR_BITS_PER_WORD, &bits) < 0 ||
@@ -102,7 +102,7 @@ void SPI_WriteByte(uint8_t value) {
         .tx_buf = (unsigned long)&value,
         .rx_buf = (unsigned long)&rx,
         .len = 1,
-        .speed_hz = 1000000, // 1 MHz
+        .speed_hz = 10000000, // 10 MHz
         .bits_per_word = 8,
     };
     if (ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr) < 0) {
@@ -117,7 +117,7 @@ UBYTE SPI_ReadByte(void) {
         .tx_buf = (unsigned long)&tx,
         .rx_buf = (unsigned long)&rx,
         .len = 1,
-        .speed_hz = 1000000, // 1 MHz
+        .speed_hz = 10000000, // 10 MHz
         .bits_per_word = 8,
     };
     if (ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr) < 0) {
