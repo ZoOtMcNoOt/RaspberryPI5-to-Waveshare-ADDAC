@@ -75,8 +75,8 @@ int DEV_ModuleInit(void) {
     }
 
     //Open the GPIO chip
-    // Note: The path should be adjusted based on the system's GPIO chip naming
-    gpio_chip = gpiod_chip_open_by_name("/dev/gpiochip4");
+    // Note: Using gpiochip4 which contains the main GPIO pins on Raspberry Pi 5
+    gpio_chip = gpiod_chip_open_by_name("gpiochip4");
     if (!gpio_chip) {
         perror("Failed to open GPIO chip");
         close(spi_fd);

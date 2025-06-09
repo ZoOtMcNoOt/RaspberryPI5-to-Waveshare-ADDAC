@@ -8,7 +8,7 @@
 #define DAC_Value_MAX  65535
 #define DAC_VREF  3.3
 
-void DAC_Out_Voltage(UBYTE Channel, float Voltage);
+void DAC8532_Out_Voltage(UBYTE Channel, float Voltage);
 void Write_DAC8532(UBYTE Channel, UWORD Data);
 
 #endif
