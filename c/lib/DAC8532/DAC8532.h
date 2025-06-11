@@ -12,29 +12,15 @@
 #ifndef _DAC8532_H_
 #define _DAC8532_H_
 
-#include "../../common/DEV_Config.h" // Ensure this path is correct
-
-// Define DAC8532 Channel selection constants
-// These are typically command bytes sent to the DAC
-// Consult the DAC8532 datasheet for the correct values and meanings.
-// Example: (These might need adjustment based on datasheet)
-//   - Bit 7-6: Don't care (or specific settings)
-//   - Bit 5-4: Power-down mode (00 = normal operation)
-//   - Bit 3-1: Address bits for DAC channel (e.g., 000 for DAC A, 001 for DAC B)
-//   - Bit 0:   Load mode (0 = update DAC register, 1 = update DAC output)
-// For simplicity, assuming direct channel selection with specific command bytes.
-// The original defines (0x30, 0x34) might be specific to a particular mode.
-// Let's make them more descriptive if their function is known, or keep as is if they are opaque command bytes.
+#include "../../common/DEV_Config.h" 
 
 /** @brief Command/Address for DAC Channel A. 
  *  This value is sent to select Channel A and set its operating mode. 
- *  (Value 0x30 might imply specific mode settings, check datasheet)
  */
 #define DAC8532_CHANNEL_A   0x30 
 
 /** @brief Command/Address for DAC Channel B. 
  *  This value is sent to select Channel B and set its operating mode. 
- *  (Value 0x34 might imply specific mode settings, check datasheet)
  */
 #define DAC8532_CHANNEL_B   0x34
 

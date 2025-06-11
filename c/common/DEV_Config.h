@@ -13,7 +13,7 @@
 #define _DEV_CONFIG_H_
 
 #include <stdint.h> // For uint8_t, uint16_t, uint32_t
-#include <stdio.h>  // For perror, fprintf (used in .c file)
+#include <stdio.h>  // For perror, fprintf
 #include <gpiod.h>  // For gpiod structures and functions
 #include "Debug.h"   // For Debug() macro
 
@@ -22,48 +22,33 @@
 #define UWORD   uint16_t
 #define UDOUBLE uint32_t
 
-/**
- * @name SPI Device Configuration
- * @{ */
+/** @name SPI Device Configuration */
 #define SPI_DEVICE      "/dev/spidev0.0" ///< SPI device path
 #define SPI_SPEED_HZ    1800000          ///< SPI clock speed in Hz (1.8 MHz)
-/** @} */
 
-/**
- * @name GPIO Chip Configuration
- * @{ */
+/** @name GPIO Chip Configuration */
 #define GPIO_CHIP_NAME  "gpiochip4"      ///< GPIO chip name (e.g., for Raspberry Pi 5)
-/** @} */
 
-/**
- * @name GPIO Pin Definitions
- * These are BCM pin numbers.
- * @{ */
+/** @name GPIO Pin Definitions (BCM numbering) */
 #define DEV_RST_PIN     18  ///< ADC Reset pin (GPIO18)
 #define DEV_CS_PIN      22  ///< ADC Chip Select pin (GPIO22)
 #define DEV_CS1_PIN     23  ///< DAC Chip Select pin (GPIO23)
 #define DEV_DRDY_PIN    17  ///< ADC Data Ready pin (GPIO17)
-/** @} */
 
-/**
- * @name GPIO Access Macros
- * @{ */
+/** @name GPIO Pin State Definitions */
+#define HIGH            1   ///< GPIO pin high state
+#define LOW             0   ///< GPIO pin low state
+
+/** @name GPIO Access Macros */
 #define DEV_Digital_Write(_pin, _value) DEV_GPIO_Write(_pin, _value) ///< Macro to write to a GPIO pin
 #define DEV_Digital_Read(_pin)          DEV_GPIO_Read(_pin)          ///< Macro to read from a GPIO pin
-/** @} */
 
-/**
- * @name SPI Communication Macros
- * @{ */
+/** @name SPI Communication Macros */
 #define DEV_SPI_WriteByte(_dat) SPI_WriteByte(_dat) ///< Macro to write a byte via SPI
 #define DEV_SPI_ReadByte()      SPI_ReadByte()      ///< Macro to read a byte via SPI
-/** @} */
 
-/**
- * @name Delay Macro
- * @{ */
+/** @name Delay Macro */
 #define DEV_Delay_ms(__xms) DEV_Delay_ms_func(__xms) ///< Macro for millisecond delay
-/** @} */
 
 /*---------------------------------------------------------------------------
                             Function Prototypes
@@ -111,5 +96,5 @@ int DEV_GPIO_Read(int pin);
  * @param ms The delay time in milliseconds.
  */
 void DEV_Delay_ms_func(int ms);
- 
+
 #endif // _DEV_CONFIG_H_

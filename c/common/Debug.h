@@ -19,16 +19,14 @@
      * @param __info Format string for the debug message.
      * @param ... Variable arguments for the format string.
      *
-     * Example usage: Debug("Value is %d\\n", myValue);
+     * Example usage: Debug("Value is %d\n", myValue);
      */
 	#define Debug(__info,...) printf("Debug: " __info,##__VA_ARGS__)
 #else
     /**
      * @brief A no-operation macro if DEBUG is disabled.
-     *
-     * When DEBUG is not defined or is 0, this macro does nothing.
      */
-	#define Debug(__info,...)  
+	#define Debug(__info,...)
 #endif
 
 #endif // __DEBUG_H
