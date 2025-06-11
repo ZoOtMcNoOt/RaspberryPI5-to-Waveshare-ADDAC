@@ -50,7 +50,6 @@ int main(void)
 {
     UDOUBLE adc_readings[8]; 
     float voltage_ch0;       
-    int i;                   
 
     printf("AD/DA Example Application Started.\r\n");
 
@@ -61,7 +60,7 @@ int main(void)
 
     signal(SIGINT, SigintHandler);
 
-    if (ADS1256_init(ADS1256_DRATE_30000SPS, ADS1256_GAIN_1, SCAN_MODE_DIFFERENTIAL_INPUTS) != 0) { 
+    if (ADS1256_init(ADS1256_30000SPS, ADS1256_GAIN_1, SCAN_MODE_DIFFERENTIAL_INPUTS) != 0) { 
         printf("ADS1256 Initialization Failed.\r\n");
         DEV_ModuleExit();
         return 1;
@@ -69,31 +68,24 @@ int main(void)
     printf("ADS1256 Initialized Successfully.\r\n");
 
     while (1) {
-        ADS1256_GetAll(adc_readings);
+        ADS1256_GetAllChannels(adc_readings);
 
-        printf("ADC Readings:\r\n");
-        for (i = 0; i < 8; i++) {
-            float voltage = ADS1256_RawToVoltage(adc_readings[i], ADS1256_GAIN_1, ADC_VREF_POS_5V0, ADC_VREF_NEG_GND); 
-            printf("  CH%d: 0x%06lX => %.4f V\r\n", i, adc_readings[i], voltage);
-        }
-
+        // The rest of the logic uses adc_readings[0] which corresponds to AIN0-AIN1
         voltage_ch0 = ADS1256_RawToVoltage(adc_readings[0], ADS1256_GAIN_1, ADC_VREF_POS_5V0, ADC_VREF_NEG_GND);
         
         if (voltage_ch0 < 0.0f) voltage_ch0 = 0.0f;
-        if (voltage_ch0 > DAC_VREF) voltage_ch0 = DAC_VREF;
-
-        printf("Setting DAC Outputs based on CH0 (%.4f V):\r\n", voltage_ch0);
+        if (voltage_ch0 > DAC_VREF) voltage_ch0 = DAC_VREF; // DAC_VREF is used from the original logic
 
         DAC8532_Out_Voltage(DAC8532_CHANNEL_B, voltage_ch0);
-        printf("  DAC CH_B: %.4f V\r\n", voltage_ch0);
 
-        float voltage_chA = DAC_VREF - voltage_ch0;
+        float voltage_chA = DAC_VREF - voltage_ch0; // DAC_VREF is used from the original logic
         if (voltage_chA < 0.0f) voltage_chA = 0.0f; 
         DAC8532_Out_Voltage(DAC8532_CHANNEL_A, voltage_chA);
-        printf("  DAC CH_A: %.4f V\r\n", voltage_chA);
 
-        printf("\033[12A"); 
-
+        // Print concise output on a single line, overwriting the previous line.
+        // Pad with spaces to clear any remnants of a longer previous line.
+        printf("\rADC CH0: %.4f V | DAC A: %.4f V | DAC B: %.4f V                ", voltage_ch0, voltage_chA, voltage_ch0);
+        fflush(stdout); // Ensure output is displayed immediately
     }
 
     DEV_ModuleExit();
