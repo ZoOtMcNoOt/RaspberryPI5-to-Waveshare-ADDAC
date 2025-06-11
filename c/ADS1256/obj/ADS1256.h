@@ -2,6 +2,7 @@
 #define _ADS1256_H_
 
 #include "DEV_Config.h"
+#include <sys/time.h>
 
 /* gain channel*/
 typedef enum
@@ -94,11 +95,46 @@ static const uint8_t ADS1256_DRATE_E[ADS1256_DRATE_MAX] =
 	0x03
 };
 
+// Performance metrics structure
+typedef struct {
+    double theoretical_max_per_channel;
+    double theoretical_total;
+    double actual_per_channel;
+    double actual_total;
+    double efficiency_percent;
+    unsigned long total_scans;
+    struct timeval start_time;
+} performance_metrics_t;
+
+
 UBYTE ADS1256_init(void);
 void ADS1256_SetMode(UBYTE Mode);
 void ADS1256_ConfigADC(ADS1256_GAIN gain, ADS1256_DRATE drate);
 UDOUBLE ADS1256_GetChannalValue(UBYTE Channel);
 void ADS1256_GetAll(UDOUBLE *ADC_Value);
-UBYTE ASD1256_ReadChipID(void);
+void ADS1256_GetAll_Fast(UDOUBLE *ADC_Value);
+UBYTE ADS1256_ReadChipID(void);
+
+// Helper functions
+void ADS1256_WriteCmd(UBYTE Cmd);
+void ADS1256_WriteReg(UBYTE Reg, UBYTE data);
+
+// === NEW OPTIMIZED 4-CHANNEL FUNCTIONS ===
+
+// 4-Channel acquisition with proper settling time (highest accuracy)
+void ADS1256_Get4Channels_Optimized(UDOUBLE *ADC_Value, UBYTE *channels);
+
+// 4-Channel acquisition with reduced settling time (higher speed, lower accuracy)
+void ADS1256_Get4Channels_Fast(UDOUBLE *ADC_Value, UBYTE *channels);
+
+// Performance monitoring functions
+void ADS1256_InitPerformanceMonitoring_4Ch(void);
+performance_metrics_t* ADS1256_GetPerformanceMetrics(void);
+void ADS1256_PrintPerformanceReport(void);
+double ADS1256_GetCurrentEfficiency(void);
+int ADS1256_IsPerformanceGood(void);
+
+// Utility functions
+float ADS1256_RawToVoltage(UDOUBLE raw_value);
 
 #endif
