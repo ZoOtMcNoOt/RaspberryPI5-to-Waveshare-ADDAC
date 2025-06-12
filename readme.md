@@ -58,8 +58,8 @@ sudo raspi-config
 
 ### Clone and Build
 ```bash
-git clone <repository-url>
-cd ads1256-dac8532-driver
+git clone https://github.com/ZoOtMcNoOt/RaspberryPI5-to-Waveshare-ADDAC
+cd RaspberryPI5-to-Waveshare-ADDAC
 
 # Build all examples
 cd c/examples/ADS1256_test
