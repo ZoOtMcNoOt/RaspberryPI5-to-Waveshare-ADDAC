@@ -38,17 +38,20 @@ typedef enum {
  */
 typedef enum
 {
-    ADS1256_GAIN_1   = 0, ///< Gain 1
-    ADS1256_GAIN_2   = 1, ///< Gain 2
-    ADS1256_GAIN_4   = 2, ///< Gain 4
-    ADS1256_GAIN_8   = 3, ///< Gain 8
-    ADS1256_GAIN_16  = 4, ///< Gain 16
-    ADS1256_GAIN_32  = 5, ///< Gain 32
-    ADS1256_GAIN_64  = 6, ///< Gain 64
+    ADS1256_GAIN_1   = 0, ///< Gain 1 (Input range: +- 5 V)
+    ADS1256_GAIN_2   = 1, ///< Gain 2 (Input range: +- 2.5 V)
+    ADS1256_GAIN_4   = 2, ///< Gain 4 (Input range: +- 1.25 V)
+    ADS1256_GAIN_8   = 3, ///< Gain 8 (Input range: +- 0.625 V)
+    ADS1256_GAIN_16  = 4, ///< Gain 16 (Input range: +- 0.3125 V)
+    ADS1256_GAIN_32  = 5, ///< Gain 32 (Input range: +- 0.15625 V)
+    ADS1256_GAIN_64  = 6, ///< Gain 64 (Input range: +- 0.078125 V)
 } ADS1256_GAIN;
 
 /**
  * @brief Enumeration for ADC data rates (SPS - Samples Per Second).
+ *  Set a data rate of a programmable filter (programmable averager).
+ * Programmable from 30,000 to 2.5 samples per second (SPS).
+ * Setting the data rate to high value results in smaller resolution of the data.
  */
 typedef enum
 {
@@ -73,20 +76,45 @@ typedef enum
 
 /**
  * @brief Enumeration for ADS1256 register addresses.
+ * Set of registers.
+ * The operation of the ADS1256 is controlled through a set of registers.
+ * Collectively, the registers contain all the information needed to configure
+ * data rate, multiplexer settings, PGA setting, calibration, etc.
  */
 typedef enum
 {
-    REG_STATUS = 0, ///< Status Register
-    REG_MUX    = 1, ///< Multiplexer Control Register
-    REG_ADCON  = 2, ///< A/D Control Register
-    REG_DRATE  = 3, ///< Data Rate Register
-    REG_IO     = 4, ///< GPIO Control Register 
-    REG_OFC0   = 5, ///< Offset Calibration Coefficient Byte 0
-    REG_OFC1   = 6, ///< Offset Calibration Coefficient Byte 1
-    REG_OFC2   = 7, ///< Offset Calibration Coefficient Byte 2
-    REG_FSC0   = 8, ///< Full-Scale Calibration Coefficient Byte 0
-    REG_FSC1   = 9, ///< Full-Scale Calibration Coefficient Byte 1
-    REG_FSC2   = 10,///< Full-Scale Calibration Coefficient Byte 2
+    REG_STATUS = 0, // Status Register
+                    // Register address: 00h, Reset value: x1H
+
+    REG_MUX    = 1, // Multiplexer Control Register
+                    // Register address: 01h, Reset value: 01H
+
+    REG_ADCON  = 2, // A/D Control Register
+                    // Register address: 02h, Reset value: 20H
+
+    REG_DRATE  = 3, // Data Rate Register
+                    // Register address: 03h, Reset value: F0H
+
+    REG_IO     = 4, // GPIO Control Register
+                    // Register address: 04h, Reset value: E0H
+
+    REG_OFC0   = 5, // Offset Calibration Coefficient Byte 0
+                    // Register address: 05h, Reset value: xxH
+
+    REG_OFC1   = 6, // Offset Calibration Coefficient Byte 1
+                    // Register address: 06h, Reset value: xxH
+
+    REG_OFC2   = 7, // Offset Calibration Coefficient Byte 2
+                    // Register address: 07h, Reset value: xxH
+
+    REG_FSC0   = 8, // Full-Scale Calibration Coefficient Byte 0
+                    // Register address: 08h, Reset value: xxH
+
+    REG_FSC1   = 9, // Full-Scale Calibration Coefficient Byte 1
+                    // Register address: 09h, Reset value: xxH
+
+    REG_FSC2   = 10,// Full-Scale Calibration Coefficient Byte 2
+                    // Register address: 0Ah, Reset value: xxH
 } ADS1256_REG;
 
 /**
@@ -115,8 +143,11 @@ typedef enum
     CMD_RDATA    = 0x01, ///< Read Data
     CMD_RDATAC   = 0x03, ///< Read Data Continuously
     CMD_SDATAC   = 0x0F, ///< Stop Read Data Continuously
-    CMD_RREG     = 0x10, ///< Read from REG rrr 
-    CMD_WREG     = 0x50, ///< Write to REG rrr 
+    CMD_RREG     = 0x10, ///< Read from REG - 1st command byte: 0001rrrr 
+						 //					  2nd command byte: 0000nnnn
+    CMD_WREG     = 0x50, ///< Write to REG  - 1st command byte: 0001rrrr
+						 //					  2nd command byte: 0000nnnn
+                         // r = starting reg address, n = number of reg addresses
     CMD_SELFCAL  = 0xF0, ///< Offset and Gain Self-Calibration
     CMD_SELFOCAL = 0xF1, ///< Offset Self-Calibration
     CMD_SELFGCAL = 0xF2, ///< Gain Self-Calibration
