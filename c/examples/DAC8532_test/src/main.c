@@ -24,18 +24,20 @@ int main(void)
     
     printf("Program start\r\n");
     
-    DAC8532_Out_Voltage(channel_A, 0);
+    DAC8532_Out_Voltage(DAC8532_CHANNEL_A, 0);
     while(1){
         for(i=0;i<50;i++){
-            DAC8532_Out_Voltage(channel_A, DAC_VREF * i / 50);
-            DAC8532_Out_Voltage(channel_B, DAC_VREF - DAC_VREF * i / 50);
-            DEV_Delay_ms(100);
+            DAC8532_Out_Voltage(DAC8532_CHANNEL_A, DAC_VREF * i / 50);
+            DAC8532_Out_Voltage(DAC8532_CHANNEL_B, DAC_VREF - DAC_VREF * i / 50);
+            DEV_Delay_ms(1);
         }
         for(i=0;i<50;i++){
-            DAC8532_Out_Voltage(channel_B, DAC_VREF * i / 50);
-            DAC8532_Out_Voltage(channel_A, DAC_VREF - DAC_VREF * i / 50);
-            DEV_Delay_ms(100);
+            DAC8532_Out_Voltage(DAC8532_CHANNEL_B, DAC_VREF * i / 50);
+            DAC8532_Out_Voltage(DAC8532_CHANNEL_A, DAC_VREF - DAC_VREF * i / 50);
+            DEV_Delay_ms(1);
         }
     }
+    DAC8532_Out_Voltage(DAC8532_CHANNEL_B, 0);
+    DAC8532_Out_Voltage(DAC8532_CHANNEL_A, 0);
     return 0;
 }
