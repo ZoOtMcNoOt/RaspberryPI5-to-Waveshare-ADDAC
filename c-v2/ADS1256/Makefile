@@ -3,14 +3,16 @@
 CC = gcc
 CFLAGS = -std=c99 -Wall -Wextra -O2
 LIBS = -lgpiod
-TARGET = ads1256
+TARGET = ads1256_libgpiod
 TEST_TARGET = test_ads1256
-SOURCE = ads1256.c
+COMPILE_TEST = compile_test
+SOURCE = ads1256_libgpiod.c
 TEST_SOURCE = test_ads1256.c
-HEADER = ads1256.h
+COMPILE_TEST_SOURCE = compile_test.c
+HEADER = ads1256_libgpiod.h
 
 # Default target
-all: $(TARGET) $(TEST_TARGET)
+all: $(TARGET) $(TEST_TARGET) $(COMPILE_TEST)
 
 # Build the main executable
 $(TARGET): $(SOURCE) $(HEADER)
@@ -20,6 +22,10 @@ $(TARGET): $(SOURCE) $(HEADER)
 $(TEST_TARGET): $(TEST_SOURCE) $(SOURCE) $(HEADER)
 	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_SOURCE) $(SOURCE) $(LIBS)
 
+# Build the compilation test
+$(COMPILE_TEST): $(COMPILE_TEST_SOURCE) $(HEADER)
+	$(CC) $(CFLAGS) -o $(COMPILE_TEST) $(COMPILE_TEST_SOURCE)
+
 # Install libgpiod if not present (Ubuntu/Debian)
 install-deps:
 	sudo apt-get update
@@ -27,7 +33,7 @@ install-deps:
 
 # Clean build artifacts
 clean:
-	rm -f $(TARGET) $(TEST_TARGET)
+	rm -f $(TARGET) $(TEST_TARGET) $(COMPILE_TEST)
 
 # Run main program with default parameters (10 measurements)
 run: $(TARGET)
@@ -36,6 +42,10 @@ run: $(TARGET)
 # Run test program
 test: $(TEST_TARGET)
 	sudo ./$(TEST_TARGET)
+
+# Test compilation only (no hardware required)
+compile-test: $(COMPILE_TEST)
+	./$(COMPILE_TEST)
 
 # Debug build with additional flags
 debug: CFLAGS += -g -DDEBUG
@@ -49,4 +59,4 @@ check-rpi5:
 # Install and build everything
 setup: install-deps all
 
-.PHONY: all clean run test debug check-rpi5 install-deps setup
+.PHONY: all clean run test compile-test debug check-rpi5 install-deps setup

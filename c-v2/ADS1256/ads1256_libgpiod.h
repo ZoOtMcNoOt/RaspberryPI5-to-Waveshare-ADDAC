@@ -5,8 +5,8 @@
 	Modified to use libgpiod instead of bcm2835 for Raspberry Pi 5 support
 */
 
-#ifndef ADS1256_H_INCLUDED
-#define ADS1256_H_INCLUDED
+#ifndef ADS1256_LIBGPIOD_H_INCLUDED
+#define ADS1256_LIBGPIOD_H_INCLUDED
 
 #include <stdio.h>
 #include <stdint.h>
@@ -30,7 +30,7 @@ typedef enum
 		- endSPI()
 */
 
-void    delayus(uint64_t microseconds);
+void    delayus(unsigned long microseconds);
 void    send8bit(uint8_t data);
 uint8_t recieve8bit(void);
 void    waitDRDY(void);

@@ -17,17 +17,13 @@
 #include <gpiod.h>
 #include <errno.h>
 #include <string.h>
+#include <stdint.h>
 
 /*
 	***************************
 	** PART 0 - enumerations **
 	***************************
 */
-
-// Set custom data types that are 8, 16 and 32 bits long.
-#define uint8_t  unsigned char  	// 1 byte
-#define uint16_t unsigned short 	// 2 bytes
-#define uint32_t unsigned long  	// 4 bytes
 
 //  Set the Programmable gain amplifier (PGA).
 enum
@@ -156,7 +152,7 @@ static uint32_t spi_speed = 976562; // ~1MHz (250MHz/256)
 #define DRDY_LOW() (gpiod_line_get_value(drdy_line) == 0)
 
 // Delay in microseconds.
-void delayus(uint64_t microseconds)
+void delayus(unsigned long microseconds)
 {
 	usleep(microseconds);
 }

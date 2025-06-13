@@ -6,7 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "ads1256.h"
+#include <stdint.h>
+#include "ads1256_libgpiod.h"
 
 void test_initialization(void);
 void test_chip_id(void);
