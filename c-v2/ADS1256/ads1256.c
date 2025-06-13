@@ -53,7 +53,7 @@ static struct gpiod_line *cs_line = NULL;
 static struct gpiod_line *drdy_line = NULL;
 
 // GPIO configuration (BCM numbering)
-#define GPIO_CHIP_NAME "gpiochip0"
+#define GPIO_CHIP_NAME "gpiochip4"
 #define RST_PIN   18  // Reset pin
 #define CS_PIN    22  // Chip Select pin
 #define DRDY_PIN  17  // Data Ready pin
@@ -171,7 +171,7 @@ int ads1256_init(void) {
     // Request CS and RST as outputs, DRDY as input with pull-up
     if (gpiod_line_request_output(rst_line, "ads1256_rst", 1) < 0 ||
         gpiod_line_request_output(cs_line, "ads1256_cs", 1) < 0 ||
-        gpiod_line_request_input_flags(drdy_line, "ads1256_drdy", GPIOD_LINE_REQUEST_FLAG_PULL_UP) < 0) {
+        gpiod_line_request_input_flags(drdy_line, "ads1256_drdy", GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_UP) < 0) {
         perror("GPIO: Failed to request lines");
         ads1256_exit();
         return -1;
