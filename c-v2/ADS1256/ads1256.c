@@ -52,6 +52,12 @@ static struct gpiod_line *rst_line = NULL;
 static struct gpiod_line *cs_line = NULL;
 static struct gpiod_line *drdy_line = NULL;
 
+// --- Scan Mode Static Variables ---
+#define MAX_SCAN_CHANNELS 8 // Maximum number of channels in a scan sequence
+static ads1256_ain_t scan_channels[MAX_SCAN_CHANNELS];
+static uint8_t num_configured_scan_channels = 0;
+static uint8_t current_scan_channel_index = 0;
+
 // GPIO configuration (BCM numbering)
 #define GPIO_CHIP_NAME "gpiochip4"
 #define RST_PIN   18  // Reset pin
@@ -293,4 +299,68 @@ int32_t ads1256_read_continuous_data(void) {
         read_val |= 0xFF000000;
     }
     return (int32_t)read_val;
+}
+
+// --- Scan Mode Function Implementations ---
+
+void ads1256_configure_scan(ads1256_ain_t p_channels[], uint8_t num_channels_to_scan) {
+    if (num_channels_to_scan == 0 || num_channels_to_scan > MAX_SCAN_CHANNELS) {
+        fprintf(stderr, "Scan: Invalid number of channels (%d). Max is %d.\n", num_channels_to_scan, MAX_SCAN_CHANNELS);
+        num_configured_scan_channels = 0;
+        return;
+    }
+    for (uint8_t i = 0; i < num_channels_to_scan; i++) {
+        scan_channels[i] = p_channels[i];
+    }
+    num_configured_scan_channels = num_channels_to_scan;
+    current_scan_channel_index = 0;
+    // It's good practice to set the MUX to the first channel in the scan here
+    // to prepare for the first call to ads1256_read_next_scanned_channel.
+    // This avoids reading an undefined channel on the first call if the MUX was not set prior.
+    if (num_configured_scan_channels > 0) {
+        wait_for_drdy(); // Ensure ADC is ready for commands
+        write_reg(REG_MUX, (scan_channels[0] << 4) | AINCOM); // Set MUX to first channel vs AINCOM
+        // No SYNC/WAKEUP here, let read_next_scanned_channel handle it to ensure proper timing.
+    }
+}
+
+int32_t ads1256_read_next_scanned_channel(void) {
+    if (num_configured_scan_channels == 0) {
+        fprintf(stderr, "Scan: Scan not configured. Call ads1256_configure_scan() first.\n");
+        return 0; // Or some error code
+    }
+
+    ads1256_ain_t current_channel = scan_channels[current_scan_channel_index];
+
+    // Set MUX for the current channel in the scan sequence
+    // This is done even if it's the first channel, as configure_scan only preps it.
+    // For subsequent channels, this is where the MUX is updated.
+    wait_for_drdy();
+    write_reg(REG_MUX, (current_channel << 4) | AINCOM); // PSEL = current_channel, NSEL = AINCOM
+
+    // Issue SYNC and WAKEUP to start conversion on the newly selected channel
+    // The ADS1256 datasheet indicates SYNC is needed to make MUX changes effective for the next conversion.
+    write_cmd(CMD_SYNC);
+    delay_us(5); // t11 delay from datasheet (SYNC to WAKEUP minimum is 4 * t_CLKIN, ~0.52us for 7.68MHz)
+                 // Using a slightly longer delay for safety.
+    write_cmd(CMD_WAKEUP);
+    delay_us(1); // t_SCCS delay (WAKEUP to DRDY low minimum is 24 * t_CLKIN, ~3.125us)
+                 // The wait_for_drdy() below will handle the actual wait.
+
+    // Wait for data to be ready and read it
+    wait_for_drdy();
+    int32_t data = read_data_raw();
+
+    // Advance to the next channel for the next call
+    current_scan_channel_index = (current_scan_channel_index + 1) % num_configured_scan_channels;
+
+    return data;
+}
+
+void ads1256_end_scan(void) {
+    num_configured_scan_channels = 0;
+    current_scan_channel_index = 0;
+    // Optionally, could send SDATAC if RDATAC was used, but this implementation
+    // uses SYNC/WAKEUP per read, so SDATAC is not strictly necessary here unless
+    // a continuous read command was somehow active from other operations.
 }

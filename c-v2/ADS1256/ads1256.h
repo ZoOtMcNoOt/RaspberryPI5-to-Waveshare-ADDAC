@@ -121,5 +121,29 @@ void ads1256_stop_continuous(void);
  */
 int32_t ads1256_read_continuous_data(void);
 
+// --- Scan Mode Functions ---
+
+/**
+ * @brief Configures the ADC for a single-ended scan sequence against AINCOM.
+ * Stores the channel sequence internally for ads1256_read_next_scanned_channel().
+ * @param p_channels Array of positive input channels (e.g., AIN0, AIN1).
+ * @param num_channels_to_scan The number of channels in the p_channels array.
+ */
+void ads1256_configure_scan(ads1256_ain_t p_channels[], uint8_t num_channels_to_scan);
+
+/**
+ * @brief Reads the next channel in the configured scan sequence.
+ * Cycles through the channels defined by ads1256_configure_scan().
+ * This function sets the MUX, issues SYNC and WAKEUP, waits for data ready, and reads.
+ * @return The 24-bit signed conversion result for the current channel in the scan.
+ *         Returns 0 if scan is not configured.
+ */
+int32_t ads1256_read_next_scanned_channel(void);
+
+/**
+ * @brief Resets the internal scan configuration (number of channels and current index).
+ */
+void ads1256_end_scan(void);
+
 
 #endif // ADS1256_H
